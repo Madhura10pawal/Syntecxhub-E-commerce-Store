@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>E-Commerce Store</title>
+</head>
+<body>
+  <h1>E-Commerce Store</h1>
+
+  <h3>Login (Admin)</h3>
+  <button onclick="login()">Login</button>
+
+  <h3>Products</h3>
+  <ul id="products"></ul>
+
+  <h3>Cart</h3>
+  <button onclick="checkout()">Checkout</button>
+
+  <script>
+    let token = "";
+
+    function login() {
+      fetch("/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: "admin@gmail.com",
+          password: "1234"
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        token = data.token;
+        alert("Login Success");
+      });
+    }
+
+    function loadProducts() {
+      fetch("/products")
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById("products").innerHTML =
+            data.map(p =>
+              `<li>${p.name} - ₹${p.price}
+              <button onclick='addToCart(${JSON.stringify(p)})'>Add</button>
+              </li>`
+            ).join("");
+        });
+    }
+
+    function addToCart(p) {
+      fetch("/cart", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(p)
+      });
+      alert("Added to Cart");
+    }
+
+    function checkout() {
+      fetch("/checkout").then(() => alert("Order Placed"));
+    }
+
+    loadProducts();
+  </script>
+</body>
+</html>
